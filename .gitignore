@@ -1,5 +1,6 @@
 # ================= Customized =================
 data/competition
+*.whl
 
 # ================= Dilivered =================
 # Byte-compiled / optimized / DLL files
@@ -91,3 +92,4 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
