@@ -29,6 +29,25 @@ main <- function(){
     fetch.one.col(reading.gpu, "acc", "GPU - Training"),
     fetch.one.col(reading.gpu, "val_acc", "GPU - Testing")
   )
-  p <- ggplot2::ggplot(readings)
-  p + ggplot2::geom_line(aes(Epoch , Accuracy, color=Type))
+  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Accuracy, col=Type, linetype=Type)) +
+    ggplot2::geom_line()+
+    ggplot2::scale_color_manual(name="CPU/GPU",
+                      values=c(
+      "CPU - Training"="#00B7F4", 
+      "CPU - Testing"="#00B7F4",
+      #"CPU - Testing"="#45CAF7",
+      "GPU - Training"="#F989A1",
+      "GPU - Testing"="#F989A1"
+      #"GPU - Testing"="#FBB3C3"
+      )
+    )+
+    ggplot2::scale_linetype_manual(name="Training/Testing",
+      values=c(
+        "solid", 
+        "twodash",
+        "solid",
+        "twodash"
+      )
+    )
+  
 }
