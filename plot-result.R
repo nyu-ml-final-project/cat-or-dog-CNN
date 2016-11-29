@@ -18,6 +18,12 @@ fetch.one.col <- function(df, col.name, Type){
   new.df
 }
 
+form.duration <- function(df, col.name="duration", Type){
+  new.df <- data.frame(Type, df[col.name])
+  colnames(new.df)<- c("Type", "Duration")
+  new.df
+}
+
 main <- function(){
   # library(ggplot2)
   reading.cpu <- read.running.result("results/11_26_first_try_cpu.txt")
@@ -49,5 +55,22 @@ main <- function(){
         "twodash"
       )
     )
+  readings <- rbind(
+    fetch.one.col(reading.cpu, "acc", "CPU - Training"),
+    fetch.one.col(reading.cpu, "val_acc", "CPU - Testing"),
+    fetch.one.col(reading.gpu, "acc", "GPU - Training"),
+    fetch.one.col(reading.gpu, "val_acc", "GPU - Testing")
+  )
+
+  readings.duration <- rbind(
+    form.duration(reading.cpu, "duration", "CPU"),
+    form.duration(reading.gpu, "duration", "GPU")
+  )
+  ggplot2::ggplot(readings.duration,
+                  ggplot2::aes(Type , Duration, col=Type))+
+    geom_boxplot(size=0.25)#+
+    #coord_flip()
   
+  print(mean(reading.cpu$duration))
+  print(mean(reading.gpu$duration))
 }
