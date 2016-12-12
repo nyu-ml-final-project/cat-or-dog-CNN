@@ -8,7 +8,7 @@ read.running.result <- function(path){
 }
 
 
-fetch.one.col <- function(df, col.name, y= "Accuracy", ...){
+fetch.one.col <- function(df, col.name, y= "Loss", ...){
   new.df <- data.frame(
             as.numeric(row.names(df)),
             df[col.name],
@@ -34,10 +34,10 @@ compare.cpu.gpu.acc <- function(){
   reading.gpu <- read.running.result("results/11_28_second_try_gpu.txt")
   
   readings <- rbind(
-    fetch.one.col(reading.cpu, "acc",     Processor = "CPU" , Dataset = "Training"),
-    fetch.one.col(reading.cpu, "val_acc", Processor = "CPU" , Dataset = "Testing"),
-    fetch.one.col(reading.gpu, "acc",     Processor = "GPU" , Dataset = "Training"),
-    fetch.one.col(reading.gpu, "val_acc", Processor = "GPU" , Dataset = "Testing")
+    fetch.one.col(reading.cpu, "acc",     y= "Accuracy", Processor = "CPU" , Dataset = "Training"),
+    fetch.one.col(reading.cpu, "val_acc", y= "Accuracy", Processor = "CPU" , Dataset = "Testing"),
+    fetch.one.col(reading.gpu, "acc",     y= "Accuracy", Processor = "GPU" , Dataset = "Training"),
+    fetch.one.col(reading.gpu, "val_acc", y= "Accuracy", Processor = "GPU" , Dataset = "Testing")
   )
   ggplot2::ggplot(readings, ggplot2::aes(Epoch , Accuracy, col=Processor, linetype=Dataset)) +
     ggplot2::geom_line()+
@@ -107,5 +107,57 @@ compare.cpu.gpu.running.time <- function(){
 }
 
 compare.layers <- function(){
+  reading.3 <- read.running.result("results/conv3-7/11_28_3_conv.txt")
+  reading.4 <- read.running.result("results/conv3-7/12_11_4_conv.txt")
+  reading.5 <- read.running.result("results/conv3-7/12_11_5_conv.txt")
+  reading.6 <- read.running.result("results/conv3-7/12_11_6_conv.txt")
+  reading.7 <- read.running.result("results/conv3-7/12_11_7_conv.txt")
   
+  readings <- rbind(
+    fetch.one.col(reading.3, "val_loss",  y="Value", Layers = 3, Index="Loss"),
+    #fetch.one.col(reading.3, "val_acc",   y="Value", Layers = 3, Index="Accuracy"),
+    fetch.one.col(reading.4, "val_loss",  y="Value", Layers = 4, Index="Loss"),
+    #fetch.one.col(reading.4, "val_acc",   y="Value", Layers = 4, Index="Accuracy"),
+    fetch.one.col(reading.5, "val_loss",  y="Value", Layers = 5, Index="Loss"),
+    #fetch.one.col(reading.5, "val_acc",   y="Value", Layers = 5, Index="Accuracy"),
+    fetch.one.col(reading.6, "val_loss",  y="Value", Layers = 6, Index="Loss"),
+    #fetch.one.col(reading.6, "val_acc",   y="Value", Layers = 6, Index="Accuracy"),
+    fetch.one.col(reading.7, "val_loss",  y="Value", Layers = 7, Index="Loss")
+    #fetch.one.col(reading.7, "val_acc",   y="Value", Layers = 7, Index="Accuracy")
+  )
+  readings$Layer <- as.factor(readings$Layers)
+  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Value, sep.line=Layer, col = Layers)) +
+    ggplot2::geom_line()+
+    ggplot2::scale_colour_gradient("Layers")
+}
+
+compare.number.of.epoch <- function(){
+  reading.normal <- read.running.result("results/11_28_second_try_gpu.txt")
+  reading.vgg    <- read.running.result("results/12_09_3_conv_with_epoch_80.txt")
+  
+  readings <- rbind(
+    fetch.one.col(reading.normal, "val_loss",  y="Value", Model = "Extended Epoch", Index="Loss"),
+    fetch.one.col(reading.vgg, "val_loss",  y="Value", Model = "VGG", Index="Loss"),
+    fetch.one.col(reading.normal, "val_acc",  y="Value", Model = "Extended Epoch", Index="Accuracy"),
+    fetch.one.col(reading.vgg, "val_acc",  y="Value", Model = "VGG", Index="Accuracy")
+  )
+  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Value, col=Model, linetype=Index)) +
+    ggplot2::geom_line()+
+    ggplot2::scale_color_manual(name="Model",
+                                values=c("Extended Epoch"="#00B7F4","VGG"="#F989A1"))
+}
+compare.vgg <- function(){
+  reading.normal <- read.running.result("results/11_28_second_try_gpu.txt")
+  reading.vgg    <- read.running.result("results/12_09_VGG16_gpu.txt")
+  
+  readings <- rbind(
+    fetch.one.col(reading.normal, "val_loss",  y="Value", Model = "Simple 3 Layers", Index="Loss"),
+    fetch.one.col(reading.vgg, "val_loss",  y="Value", Model = "VGG 16", Index="Loss"),
+    fetch.one.col(reading.normal, "val_acc",  y="Value", Model = "Simple 3 Layers", Index="Accuracy"),
+    fetch.one.col(reading.vgg, "val_acc",  y="Value", Model = "VGG 16", Index="Accuracy")
+  )
+  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Value, col=Model, linetype=Index)) +
+    ggplot2::geom_line()+
+    ggplot2::scale_color_manual(name="Model",
+                                values=c("Simple 3 Layers"="#00B7F4","VGG 16"="#F989A1"))
 }
