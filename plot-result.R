@@ -50,7 +50,7 @@ compare.cpu.gpu.acc <- function(){
                                    )
     )
 }
-compare.cpu.gpu.loss <- function(){
+compare.cpu.gpu <- function(){
   reading.cpu <- read.running.result("results/11_26_first_try_cpu.txt")
   reading.gpu <- read.running.result("results/11_28_second_try_gpu.txt")
   
@@ -60,7 +60,8 @@ compare.cpu.gpu.loss <- function(){
     fetch.one.col(reading.cpu, "val_acc",  y="Indexes",   Index = "Accuracy" , Processor = "CPU"),
     fetch.one.col(reading.cpu, "val_loss",  y="Indexes", Index = "Loss" , Processor = "CPU")
   )
-  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Indexes, linetype=Processor)) +
+  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Indexes, col=Processor)) +
+  #ggplot2::ggplot(readings, ggplot2::aes(Epoch , Indexes, linetype=Processor)) +
     ggplot2::geom_line()+
     #ggplot2::scale_color_manual(name="Processor",
     #                            values=c("CPU"="#00B7F4","GPU"="#F989A1"))+
@@ -81,14 +82,12 @@ compare.acc.loss <- function(){
     fetch.one.col(reading.cpu, "loss",  y="Indexes",   Index = "Loss" , Dataset = "Training"),
     fetch.one.col(reading.cpu, "val_loss",  y="Indexes", Index = "Loss" , Dataset = "Testing")
   )
-  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Indexes, linetype=Dataset)) +
+  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Indexes, col=Dataset, linetype=Dataset)) +
+  #ggplot2::ggplot(readings, ggplot2::aes(Epoch , Indexes, linetype=Dataset)) +
     ggplot2::geom_line()+
-    #ggplot2::scale_linetype_manual(name="Dataset",
-    #                               values=c(
-    #                                 "Training"= "solid", 
-    #                                 "Testing" = "twodash"
-    #                               )
-    #)
+    ggplot2::scale_linetype_manual(name="Dataset",
+                                   values=c("Training"= "twodash", "Testing" = "solid")
+    )+
     ggplot2::facet_grid( Index ~ . ,scales = "free_y")
 }
 compare.cpu.gpu.running.time <- function(){
@@ -100,7 +99,8 @@ compare.cpu.gpu.running.time <- function(){
     form.duration(reading.gpu, "duration", Processor = "GPU")
   )
   ggplot2::ggplot(readings.duration,
-                  ggplot2::aes(Processor , Duration, col.sep=Processor))+
+                  #ggplot2::aes(Processor , Duration, col.sep=Processor))+
+                  ggplot2::aes(Processor , Duration, col=Processor))+
     ggplot2::geom_boxplot(size=0.25)+
     ggplot2::coord_flip()
   
@@ -144,15 +144,15 @@ compare.layers <- function(){
     Top.1
   )
   Tops$Top <- as.factor(Tops$Top)
-  #ggplot2::ggplot(Tops, ggplot2::aes(Layer , Accuracy, color = Top, linetype = Top )) +
-  ggplot2::ggplot(Tops, ggplot2::aes(Layer , Accuracy, linetype = Top)) +
+  ggplot2::ggplot(Tops, ggplot2::aes(Layer , Accuracy, color = Top, linetype = Top )) +
+  #ggplot2::ggplot(Tops, ggplot2::aes(Layer , Accuracy, linetype = Top)) +
     ggplot2::geom_line()+
-  #  ggplot2::scale_colour_manual(name="Mean Top #",
-  #                               values=c("5"  = "#00B7F4", "1"  = 2,"10" = 3))+
-  #  ggplot2::scale_linetype_manual(name="Mean Top #",
-  #                                 values=c("5"  = 1, "1"  = 2,"10" = 2))
+    ggplot2::scale_colour_manual(name="Mean Top #",
+                                 values=c("5"  = "#00B7F4", "1"  = 2,"10" = 3))+
     ggplot2::scale_linetype_manual(name="Mean Top #",
-                                   values=c("5"  = 1, "1"  = 2,"10" = 3))
+                                   values=c("5"  = 1, "1"  = 2,"10" = 2))
+  #  ggplot2::scale_linetype_manual(name="Mean Top #",
+  #                                 values=c("5"  = 1, "1"  = 2,"10" = 3))
 }
 compare.layers.dumb <- function(){
   reading.3 <- read.running.result("results/conv3-7/11_28_3_conv.txt")
@@ -208,9 +208,10 @@ compare.vgg <- function(){
     fetch.one.col(reading.normal, "val_loss",  y="Value", Model = "Baseline", Index="Loss"),
     fetch.one.col(reading.normal, "val_acc",  y="Value", Model = "Baseline", Index="Accuracy")
   )
-  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Value, linetype=Model)) +
+  ggplot2::ggplot(readings, ggplot2::aes(Epoch , Value, col=Model, linetype=Model)) +
+  #ggplot2::ggplot(readings, ggplot2::aes(Epoch , Value, linetype=Model)) +
     ggplot2::geom_line()+
-    #ggplot2::scale_color_manual(name="Model",
-    #                            values=c("Simple 3 Layers"="#00B7F4","VGG 16"="#F989A1"))
+    ggplot2::scale_color_manual(name="Model",
+                                values=c("Baseline"="#00B7F4","VGG 16"="#F989A1"))+
     ggplot2::facet_grid( Index ~ . ,scales = "free_y")
 }
